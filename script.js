@@ -101,6 +101,75 @@
     });
   }
 
+  function initTestimonialsCarousel() {
+    var root = document.getElementById('testimonials-carousel');
+    if (!root) return;
+
+    var track = root.querySelector('.overflow-hidden > .flex');
+    if (!track) return;
+
+    var slides = track.children;
+    if (!slides.length) return;
+
+    var index = 0;
+    var autoplay = null;
+    var paused = false;
+
+    track.style.transition = 'transform 0.55s ease';
+    track.style.willChange = 'transform';
+
+    function offsetFor(i) {
+      var x = 0;
+      for (var n = 0; n < i; n++) x += slides[n].offsetWidth;
+      return x;
+    }
+
+    function goTo(i) {
+      index = (i + slides.length) % slides.length;
+      track.style.transform = 'translate3d(-' + offsetFor(index) + 'px,0,0)';
+    }
+
+    function next() { goTo(index + 1); }
+    function prev() { goTo(index - 1); }
+
+    function startAutoplay() {
+      clearInterval(autoplay);
+      autoplay = setInterval(function () {
+        if (!paused) next();
+      }, 3500);
+    }
+
+    root.querySelectorAll('button[aria-label]').forEach(function (btn) {
+      var label = (btn.getAttribute('aria-label') || '').toLowerCase();
+      if (label.indexOf('anterior') !== -1) {
+        btn.addEventListener('click', function () { prev(); startAutoplay(); });
+      }
+      if (label.indexOf('pr') !== -1 && label.indexOf('ximo') !== -1) {
+        btn.addEventListener('click', function () { next(); startAutoplay(); });
+      }
+    });
+
+    root.addEventListener('mouseenter', function () { paused = true; });
+    root.addEventListener('mouseleave', function () { paused = false; });
+
+    var touchX = 0;
+    track.addEventListener('touchstart', function (e) {
+      touchX = e.touches[0].clientX;
+    }, { passive: true });
+
+    track.addEventListener('touchend', function (e) {
+      var diff = touchX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) {
+        if (diff > 0) next(); else prev();
+        startAutoplay();
+      }
+    }, { passive: true });
+
+    window.addEventListener('resize', function () { goTo(index); });
+    goTo(0);
+    startAutoplay();
+  }
+
   function initNoSelect() {
     document.querySelectorAll('img,.no-select').forEach(function (el) {
       el.addEventListener('dragstart', function (e) { e.preventDefault(); });
@@ -112,6 +181,7 @@
     initHeroPeel();
     initPurchaseLinks();
     initContactLinks();
+    initTestimonialsCarousel();
     initNoSelect();
   });
 })();
