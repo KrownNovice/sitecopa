@@ -7,7 +7,7 @@
 
   var _L = {
     26: _d('aHR0cHM6Ly9wYXkuY2FrdG8uY29tLmJyL3Z1ZmlyZm1fOTQzMTcx'),
-    22: _d('aHR0cHM6Ly9wYXkuY2FrdG8uY29tLmJyL289azdkaHpfOTQzMDk3'),
+    22: _d('aHR0cHM6Ly9wYXkuY2FrdG8uY29tLmJyL285azdkaHpfOTQzMDk3'),
     18: _d('aHR0cHM6Ly9wYXkuY2FrdG8uY29tLmJyL3dibm40a2pfOTQzMDI5'),
     14: _d('aHR0cHM6Ly9wYXkuY2FrdG8uY29tLmJyLzNmdW1na25fOTQzMDk5'),
     c: _d('aHR0cHM6Ly9wYXkuY2FrdG8uY29tLmJyL240Znlka3pfOTQzMTA5'),
@@ -71,13 +71,26 @@
   function resolvePay(btn) {
     var txt = btn.textContent || '';
     if (/GARANTIR TODOS/i.test(txt)) return _L.c;
+
     if (/COMPRAR KIT/i.test(txt)) {
-      var card = btn.closest('[class*="rounded-3xl"]') || btn.closest('section');
-      var title = card && card.querySelector('h3') ? card.querySelector('h3').textContent : '';
-      if (/2022/i.test(title)) return _L[22];
-      if (/2018/i.test(title)) return _L[18];
-      if (/2014/i.test(title)) return _L[14];
+      var card = btn.closest('.rounded-3xl');
+      if (card) {
+        var title = (card.querySelector('h3') && card.querySelector('h3').textContent) || '';
+        var alt = (card.querySelector('img[alt]') && card.querySelector('img[alt]').alt) || '';
+        var label = (title + ' ' + alt).toLowerCase();
+
+        if (label.indexOf('2022') !== -1 || label.indexOf('catar') !== -1) {
+          return _L[22];
+        }
+        if (label.indexOf('2018') !== -1 || label.indexOf('rússia') !== -1 || label.indexOf('russia') !== -1) {
+          return _L[18];
+        }
+        if (label.indexOf('2014') !== -1 || label.indexOf('brasil') !== -1) {
+          return _L[14];
+        }
+      }
     }
+
     return _L[26];
   }
 
