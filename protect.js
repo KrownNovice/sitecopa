@@ -1,13 +1,16 @@
 (function () {
   'use strict';
 
+  // Compatível com Meta Pixel — não altera fbq nem bloqueia scripts do Facebook
+  var pixelGuard = window.fbq;
+
   function block(e) {
     e.preventDefault();
     return false;
   }
 
-  // Proteção leve — não bloqueia o acesso ao site
   document.addEventListener('contextmenu', block);
+
   document.addEventListener('keydown', function (e) {
     var key = e.key;
     var code = e.keyCode || e.which;
@@ -22,4 +25,9 @@
       block(e);
     }
   });
+
+  // Garante que a proteção não remove o fbq após o Pixel carregar
+  if (typeof window.fbq !== 'function' && pixelGuard) {
+    window.fbq = pixelGuard;
+  }
 })();
